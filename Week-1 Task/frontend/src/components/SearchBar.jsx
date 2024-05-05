@@ -4,11 +4,17 @@ import { getQuotesByAuthor } from '../services/api';
 const SearchBar = () => {
   const [input, setInput] = useState('');
   const [quotes, setQuotes] = useState([]);
+  const [error, setError] = useState('');
 
   const handleSearch = async (event) => {
     event.preventDefault();
     const data = await getQuotesByAuthor(input);
-    setQuotes(data);
+    if (data.length === 0) {
+      setError(`No quotes found for author "${input}"`);
+    } else {
+      setError('');
+      setQuotes(data);
+    }
   };
 
   return (
@@ -32,9 +38,11 @@ const SearchBar = () => {
         </form>
       </div>
 
+      {error && <div className="text-red-500 text-center mt-2">{error}</div>}
+
       {quotes && quotes.map((quote) => (
-        <div className='flex justify-center'>
-          <div key={quote._id} className="bg-gray-100/50 font-semibold p-6 rounded-md w-full max-w-md m-3">
+        <div className="flex justify-center" key={quote._id}>
+          <div className="bg-gray-100/50 font-semibold p-6 rounded-md w-full max-w-md m-3">
             <p>"{quote.text}"</p>
           </div>
         </div>

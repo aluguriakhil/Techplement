@@ -4,21 +4,28 @@ import axios from 'axios';
 const NewQuote = () => {
   const [author, setAuthor] = useState('');
   const [text, setText] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const baseURL = import.meta.env.VITE_BACKEND_URL;
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     const quoteData = { author, text };
+    setLoading(true);
     try {
-      const response = await axios.post('http://localhost:5000/quotes', quoteData);
+      const response = await axios.post(`${baseURL}\quotes`, quoteData);
       console.log('New quote added:', response.data);
       // Clear the form
       setAuthor('');
       setText('');
-      // Show alert
+      // Show alert or success message
       window.alert('Quotation added successfully!');
     } catch (error) {
       console.error('Error adding new quote:', error);
+      // Show error message or handle error as needed
+      window.alert('Error adding quote. Please try again later.');
     }
+    setLoading(false);
   };
 
   return (
@@ -26,8 +33,9 @@ const NewQuote = () => {
       <h2 className="text-xl font-semibold mb-4 text-white">Add a New Quote</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block mb-1 text-white">Author:</label>
+          <label htmlFor="author" className="block mb-1 text-white">Author:</label>
           <input
+            id="author"
             type="text"
             value={author}
             onChange={(e) => setAuthor(e.target.value)}
@@ -36,8 +44,9 @@ const NewQuote = () => {
           />
         </div>
         <div>
-          <label className="block mb-1 text-white">Quote:</label>
+          <label htmlFor="quote" className="block mb-1 text-white">Quote:</label>
           <textarea
+            id="quote"
             value={text}
             onChange={(e) => setText(e.target.value)}
             className="w-full px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500"
@@ -47,9 +56,10 @@ const NewQuote = () => {
         </div>
         <button
           type="submit"
-          className="w-full px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 focus:outline-none focus:bg-purple-600"
+          className={`w-full px-4 py-2 bg-purple-500 text-white rounded-md focus:outline-none focus:bg-purple-600 ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-purple-600'}`}
+          disabled={loading}
         >
-          Add Quote
+          {loading ? 'Adding...' : 'Add Quote'}
         </button>
       </form>
     </div>
